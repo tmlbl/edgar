@@ -1,0 +1,156 @@
+<SEC-DOCUMENT>0000950123-17-011329.txt : 20171213
+<SEC-HEADER>0000950123-17-011329.hdr.sgml : 20171213
+<ACCEPTANCE-DATETIME>20171212173443
+ACCESSION NUMBER:		0000950123-17-011329
+CONFORMED SUBMISSION TYPE:	13F-HR/A
+PUBLIC DOCUMENT COUNT:		2
+CONFORMED PERIOD OF REPORT:	20170331
+FILED AS OF DATE:		20171213
+DATE AS OF CHANGE:		20171212
+EFFECTIVENESS DATE:		20171213
+
+FILER:
+
+	COMPANY DATA:	
+		COMPANY CONFORMED NAME:			Cloverdale Capital Management, LLC
+		CENTRAL INDEX KEY:			0001635925
+		IRS NUMBER:				464937137
+		STATE OF INCORPORATION:			DE
+		FISCAL YEAR END:			1231
+
+	FILING VALUES:
+		FORM TYPE:		13F-HR/A
+		SEC ACT:		1934 Act
+		SEC FILE NUMBER:	028-17845
+		FILM NUMBER:		171252570
+
+	BUSINESS ADDRESS:	
+		STREET 1:		2651 N. HARWOOD
+		STREET 2:		SUITE 500
+		CITY:			DALLAS
+		STATE:			TX
+		ZIP:			75201
+		BUSINESS PHONE:		214-254-4065
+
+	MAIL ADDRESS:	
+		STREET 1:		2651 N. HARWOOD
+		STREET 2:		SUITE 500
+		CITY:			DALLAS
+		STATE:			TX
+		ZIP:			75201
+</SEC-HEADER>
+<DOCUMENT>
+<TYPE>13F-HR/A
+<SEQUENCE>1
+<FILENAME>primary_doc.xml
+<TEXT>
+<XML>
+<?xml version="1.0" encoding="UTF-8"?>
+<edgarSubmission xsi:schemaLocation="http://www.sec.gov/edgar/thirteenffiler eis_13F_Filer.xsd" xmlns="http://www.sec.gov/edgar/thirteenffiler" xmlns:ns1="http://www.sec.gov/edgar/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <headerData>
+    <submissionType>13F-HR/A</submissionType>
+    <filerInfo>
+      <liveTestFlag>LIVE</liveTestFlag>
+      <flags>
+        <confirmingCopyFlag>false</confirmingCopyFlag>
+        <returnCopyFlag>true</returnCopyFlag>
+        <overrideInternetFlag>false</overrideInternetFlag>
+      </flags>
+      <filer>
+        <credentials>
+          <cik>0001635925</cik>
+          <ccc>XXXXXXXX</ccc>
+        </credentials>
+      </filer>
+      <periodOfReport>03-31-2017</periodOfReport>
+    </filerInfo>
+  </headerData>
+  <formData>
+    <coverPage>
+      <reportCalendarOrQuarter>03-31-2017</reportCalendarOrQuarter>
+      <isAmendment>true</isAmendment>
+      <amendmentNo>2</amendmentNo>
+      <amendmentInfo>
+        <amendmentType>NEW HOLDINGS</amendmentType>
+      </amendmentInfo>
+      <filingManager>
+        <name>Cloverdale Capital Management, LLC</name>
+        <address>
+          <ns1:street1>2651 N. Harwood</ns1:street1>
+          <ns1:street2>Suite 500</ns1:street2>
+          <ns1:city>Dallas</ns1:city>
+          <ns1:stateOrCountry>TX</ns1:stateOrCountry>
+          <ns1:zipCode>75201</ns1:zipCode>
+        </address>
+      </filingManager>
+      <reportType>13F HOLDINGS REPORT</reportType>
+      <form13FFileNumber>028-17845</form13FFileNumber>
+      <provideInfoForInstruction5>N</provideInfoForInstruction5>
+    </coverPage>
+    <signatureBlock>
+      <name>C. Jonathan Gattman</name>
+      <title>Sole Member</title>
+      <phone>214-254-4065</phone>
+      <signature>/s/ C. Jonathan Gattman</signature>
+      <city>Dallas</city>
+      <stateOrCountry>TX</stateOrCountry>
+      <signatureDate>12-12-2017</signatureDate>
+    </signatureBlock>
+    <summaryPage>
+      <otherIncludedManagersCount>0</otherIncludedManagersCount>
+      <tableEntryTotal>2</tableEntryTotal>
+      <tableValueTotal>6881</tableValueTotal>
+      <isConfidentialOmitted>false</isConfidentialOmitted>
+    </summaryPage>
+  </formData>
+</edgarSubmission>
+</XML>
+</TEXT>
+</DOCUMENT>
+<DOCUMENT>
+<TYPE>INFORMATION TABLE
+<SEQUENCE>2
+<FILENAME>form13fInfoTable.xml
+<DESCRIPTION>INFORMATION TABLE FOR FORM 13F
+<TEXT>
+<XML>
+<informationTable xmlns="http://www.sec.gov/edgar/document/thirteenf/informationtable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <infoTable>
+       <nameOfIssuer>NVIDIA CORP</nameOfIssuer>
+       <titleOfClass>COM</titleOfClass>
+       <cusip>67066G104</cusip>
+       <value>5370</value>
+       <shrsOrPrnAmt>
+           <sshPrnamt>49300</sshPrnamt>
+           <sshPrnamtType>SH</sshPrnamtType>
+       </shrsOrPrnAmt>
+       <putCall>Put</putCall>
+       <investmentDiscretion>SOLE</investmentDiscretion>
+       <votingAuthority>
+           <Sole>49300</Sole>
+           <Shared>0</Shared>
+           <None>0</None>
+       </votingAuthority>
+   </infoTable>
+   <infoTable>
+       <nameOfIssuer>PETMED EXPRESS INC</nameOfIssuer>
+       <titleOfClass>COM</titleOfClass>
+       <cusip>716382106</cusip>
+       <value>1511</value>
+       <shrsOrPrnAmt>
+           <sshPrnamt>75000</sshPrnamt>
+           <sshPrnamtType>SH</sshPrnamtType>
+       </shrsOrPrnAmt>
+       <putCall>Put</putCall>
+       <investmentDiscretion>SOLE</investmentDiscretion>
+       <votingAuthority>
+           <Sole>75000</Sole>
+           <Shared>0</Shared>
+           <None>0</None>
+       </votingAuthority>
+   </infoTable>
+</informationTable>
+</XML>
+</TEXT>
+</DOCUMENT>
+</SEC-DOCUMENT>
