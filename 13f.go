@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mmcdole/gofeed"
 )
@@ -37,6 +39,11 @@ func Latest13F() ([]InformationTable, error) {
 		if err != nil {
 			return nil, err
 		}
+		info, err := parse13fheader(string(body))
+		if err != nil {
+			return nil, err
+		}
+		table.ReportInfo = info
 		tables = append(tables, *table)
 	}
 	return tables, nil
@@ -48,22 +55,35 @@ func extractID(guid string) string {
 }
 
 type InfoTable struct {
-	Issuer     string   `xml:"nameOfIssuer"`
-	ClassTitle string   `xml:"titleOfClass"`
-	CUSIP      string   `xml:"cusip"`
-	Value      int      `xml:"value"`
-	Position   Position `xml:"shrsOrPrnAmt"`
+	Issuer       string       `xml:"nameOfIssuer"`
+	ClassTitle   string       `xml:"titleOfClass"`
+	CUSIP        string       `xml:"cusip"`
+	Value        int          `xml:"value"`
+	PositionInfo PositionInfo `xml:"shrsOrPrnAmt"`
 }
 
-// Position represents SH / PRN
+// PositionInfo represents SH / PRN
 // Shares or principal amt
-type Position struct {
+type PositionInfo struct {
 	Amount int    `xml:"sshPrnamt"`
 	Type   string `xml:"sshPrnamtType"`
 }
 
 type InformationTable struct {
-	InfoTable []InfoTable `xml:"infoTable"`
+	ReportInfo *ReportInfo
+	InfoTable  []InfoTable `xml:"infoTable"`
+}
+
+// Position is the structure we ultimately want to store. It contains data
+// relevant to after-the-fact analysis of position data.
+type Position struct {
+	DocumentID     string
+	CompanyID      int
+	CUSIP          string
+	Value          int
+	PositionAmount int
+	PositionType   string
+	DateObserved   time.Time
 }
 
 func parse13f(data string) (*InformationTable, error) {
@@ -92,4 +112,66 @@ func parse13f(data string) (*InformationTable, error) {
 		return nil, err
 	}
 	return &table, nil
+}
+
+type ReportInfo struct {
+	AccessionNumber string
+	DateFiled       time.Time
+	CompanyIRS      int
+}
+
+const dateFormat = "20060102"
+
+func extractval(ln string) string {
+	return strings.TrimSpace(strings.Split(ln, ":")[1])
+}
+
+func parse13fheader(data string) (*ReportInfo, error) {
+	info := ReportInfo{}
+	lines := strings.Split(data, "\n")
+
+	for _, ln := range lines {
+		// Document ID
+		if strings.Contains(ln, "ACCESSION NUMBER:") {
+			info.AccessionNumber = extractval(ln)
+		}
+		// Filing date
+		if strings.Contains(ln, "FILED AS OF DATE:") {
+			str := extractval(ln)
+			t, err := time.Parse(dateFormat, str)
+			if err != nil {
+				return nil, err
+			}
+			info.DateFiled = t
+		}
+		// IRS number of filer
+		if strings.Contains(ln, "IRS NUMBER:") {
+			num, err := strconv.Atoi(extractval(ln))
+			if err != nil {
+				return nil, err
+			}
+			info.CompanyIRS = num
+		}
+	}
+
+	return &info, nil
+}
+
+func toPositionList(table *InformationTable) []Position {
+	ps := []Position{}
+
+	for _, t := range table.InfoTable {
+		p := Position{
+			DocumentID:     table.ReportInfo.AccessionNumber,
+			CompanyID:      table.ReportInfo.CompanyIRS,
+			CUSIP:          t.CUSIP,
+			Value:          t.Value,
+			PositionAmount: t.PositionInfo.Amount,
+			PositionType:   t.PositionInfo.Type,
+			DateObserved:   table.ReportInfo.DateFiled,
+		}
+		ps = append(ps, p)
+	}
+
+	return ps
 }
