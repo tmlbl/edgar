@@ -77,9 +77,9 @@ type InformationTable struct {
 // Position is the structure we ultimately want to store. It contains data
 // relevant to after-the-fact analysis of position data.
 type Position struct {
-	DocumentID     string
+	DocumentID     string `gorm:"primary_key"`
 	CompanyID      int
-	CUSIP          string
+	CUSIP          string `gorm:"primary_key"`
 	Value          int
 	PositionAmount int
 	PositionType   string
@@ -157,7 +157,7 @@ func parse13fheader(data string) (*ReportInfo, error) {
 	return &info, nil
 }
 
-func toPositionList(table *InformationTable) []Position {
+func ToPositionList(table *InformationTable) []Position {
 	ps := []Position{}
 
 	for _, t := range table.InfoTable {

@@ -17,7 +17,7 @@ func TestLatest13F(t *testing.T) {
 	}
 
 	for _, t := range tables {
-		fmt.Println(toPositionList(&t))
+		fmt.Println(ToPositionList(&t))
 	}
 }
 
