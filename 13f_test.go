@@ -57,3 +57,12 @@ func TestParse13FHeader(t *testing.T) {
 		t.Errorf("IRS number should be %d, got %d", 464937137, info.CompanyIRS)
 	}
 }
+
+func TestParseLegacy13F(t *testing.T) {
+	data, _ := ioutil.ReadFile("test/legacy_sample_13f.txt")
+	info, err := parse13f(string(data))
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(info)
+}

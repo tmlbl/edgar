@@ -124,6 +124,11 @@ func parse13f(data string) (*InformationTable, error) {
 		}
 	}
 
+	if len(xlines) < 1 {
+		fmt.Println("I'm confused, so I will try the legacy parser...")
+		return parseLegacy13F(data)
+	}
+
 	xdata := strings.Join(xlines, "\n")
 	table := InformationTable{}
 	err := xml.Unmarshal([]byte(xdata), &table)
@@ -131,6 +136,89 @@ func parse13f(data string) (*InformationTable, error) {
 		return nil, err
 	}
 	return &table, nil
+}
+
+// Filters down a slice of lines to those appearing between the XML-style
+// delimiter provided.
+func extractLines(delim string, lines []string) [][]string {
+	xxlines := [][]string{}
+	cap := false
+	xlines := []string{}
+
+	for _, ln := range lines {
+		if strings.Index(ln, "<"+delim) != -1 {
+			cap = true
+			fmt.Println("cap start", ln)
+		}
+
+		if cap {
+			xlines = append(xlines, ln)
+		}
+
+		if cap && (strings.Index(ln, "</"+delim) != -1) {
+			cap = false
+			xxlines = append(xxlines, xlines)
+			xlines = []string{}
+			fmt.Println("cap end", ln)
+		}
+	}
+
+	return xxlines
+}
+
+// The legacy filings are in a whitespace-delimited format. By reading a header
+// row, we can get a picture of where we should split subsequent lines to
+// isolate individual fields.
+func legacyGetFormat(lines []string) ([]int, error) {
+	// Find the line with <S> and <C> entries to get the whitespace format of the
+	// text report.
+	for _, ln := range lines {
+		if len(ln) > 3 && ln[0:3] == "<S>" {
+			format := []int{}
+
+			for i, c := range ln {
+				if c == '<' {
+					format = append(format, i)
+				}
+			}
+			return format, nil
+		}
+	}
+	// Error condition - no format found
+	return nil, fmt.Errorf("No format header row detected")
+}
+
+func parseLegacy13F(data string) (*InformationTable, error) {
+	lines := strings.Split(data, "\n")
+
+	tables := extractLines("TABLE", lines)
+
+	for _, t := range tables {
+		format, err := legacyGetFormat(t)
+		if err != nil {
+			panic(err)
+		}
+		for _, ln := range t {
+			fields := []string{}
+
+			if len(ln) < format[len(format)-1] {
+				fmt.Println("This line is too short:", ln)
+				continue
+			}
+
+			for i := range format {
+				if i < len(format)-1 {
+					f := strings.TrimSpace(ln[format[i]:format[i+1]])
+					fields = append(fields, f)
+				} else {
+					fields = append(fields, strings.TrimSpace(ln[format[i]:]))
+				}
+			}
+			fmt.Println(len(fields))
+		}
+	}
+
+	return nil, nil
 }
 
 type ReportInfo struct {
