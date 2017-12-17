@@ -14,22 +14,27 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-var url13f = "https://www.sec.gov/cgi-bin/browse-edgar?" +
+var urlnew13f = "https://www.sec.gov/cgi-bin/browse-edgar?" +
 	"action=getcurrent&CIK=&type=13F&output=atom"
 
 // Latest13F pulls the latest 13F filings from an EDGAR RSS feed.
 // This typically only contains < 10 of the most recent filings.
 func Latest13F() ([]InformationTable, error) {
+	return parsefeed13f(urlnew13f)
+}
+
+func parsefeed13f(url string) ([]InformationTable, error) {
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(url13f)
+	fmt.Println("SEC req", url)
+	feed, err := fp.ParseURL(url)
 	tables := []InformationTable{}
 
 	if err != nil {
 		return nil, err
 	}
 	for _, it := range feed.Items {
-		fmt.Println(it.Link)
 		link := strings.Replace(it.Link, "-index.htm", ".txt", 1)
+		fmt.Println("SEC req", link)
 		resp, err := http.Get(link)
 		if err != nil {
 			return nil, err
@@ -37,16 +42,30 @@ func Latest13F() ([]InformationTable, error) {
 		body, _ := ioutil.ReadAll(resp.Body)
 		table, err := parse13f(string(body))
 		if err != nil {
-			return nil, err
+			// return nil, err
+			fmt.Println("Error parsing 13F form:", err)
+			continue
 		}
 		info, err := parse13fheader(string(body))
 		if err != nil {
-			return nil, err
+			// return nil, err
+			fmt.Println("Error parsing 13F form header:", err)
+			continue
 		}
 		table.ReportInfo = info
 		tables = append(tables, *table)
+		time.Sleep(time.Millisecond * time.Duration(200))
 	}
 	return tables, nil
+}
+
+// Company13Fs will pull all available 13F filings for the company for the given
+// CIK number.
+func Company13Fs(cik string) ([]InformationTable, error) {
+	urltmp := "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&" +
+		"CIK=%s&type=13F%%25&output=atom"
+	url := fmt.Sprintf(urltmp, cik)
+	return parsefeed13f(url)
 }
 
 func extractID(guid string) string {
