@@ -78,7 +78,7 @@ type InformationTable struct {
 // relevant to after-the-fact analysis of position data.
 type Position struct {
 	DocumentID     string `gorm:"primary_key"`
-	CompanyID      int
+	CompanyID      string
 	CUSIP          string `gorm:"primary_key"`
 	Value          int
 	PositionAmount int
@@ -118,6 +118,7 @@ type ReportInfo struct {
 	AccessionNumber string
 	DateFiled       time.Time
 	CompanyIRS      int
+	CompanyCIK      string
 }
 
 const dateFormat = "20060102"
@@ -152,6 +153,11 @@ func parse13fheader(data string) (*ReportInfo, error) {
 			}
 			info.CompanyIRS = num
 		}
+
+		// SEC CIK number of filer
+		if strings.Contains(ln, "CENTRAL INDEX KEY:") {
+			info.CompanyCIK = extractval(ln)
+		}
 	}
 
 	return &info, nil
@@ -163,7 +169,7 @@ func ToPositionList(table *InformationTable) []Position {
 	for _, t := range table.InfoTable {
 		p := Position{
 			DocumentID:     table.ReportInfo.AccessionNumber,
-			CompanyID:      table.ReportInfo.CompanyIRS,
+			CompanyID:      table.ReportInfo.CompanyCIK,
 			CUSIP:          t.CUSIP,
 			Value:          t.Value,
 			PositionAmount: t.PositionInfo.Amount,
