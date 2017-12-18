@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	handle, err := gorm.Open("postgres",
-		"host=localhost port=5432 sslmode=disable user=postgres dbname=edgar")
+		"host=localhost port=5431 sslmode=disable user=postgres dbname=edgar")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,6 +72,7 @@ func insertIfMissing(t edgar.InformationTable) {
 	if err == gorm.ErrRecordNotFound {
 		start := time.Now()
 		tx := db.Begin()
+		fmt.Println(t.InfoTable[0].Issuer)
 		positions := edgar.ToPositionList(&t)
 		for _, p := range positions {
 			tx.Save(&p)
