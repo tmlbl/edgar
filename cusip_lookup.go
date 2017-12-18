@@ -36,6 +36,13 @@ type FidelityLookupResult struct {
 	Symbol      string
 }
 
+type Security struct {
+	Type        string
+	CompanyName string
+	Symbol      string
+	CUSIP       string `gorm:"primary_key"`
+}
+
 func cusipParams(t FidelitySecurityType, cusip string) map[string]string {
 	return map[string]string{
 		"reqforlookup": "REQUESTFORLOOKUP",
@@ -58,7 +65,7 @@ func qstring(params map[string]string) string {
 	return fmt.Sprintf("?%s", strings.Join(kvs, "&"))
 }
 
-func LookupCUSIP(t FidelitySecurityType, cusip string) (*FidelityLookupResult, error) {
+func LookupCUSIP(t FidelitySecurityType, cusip string) (*Security, error) {
 	u := cusipBaseURL + qstring(cusipParams(t, cusip))
 	resp, err := http.Get(u)
 	if err != nil {
@@ -96,10 +103,11 @@ func LookupCUSIP(t FidelitySecurityType, cusip string) (*FidelityLookupResult, e
 		return nil, fmt.Errorf("Could not extract symbol for CUSIP %s", cusip)
 	}
 
-	result := FidelityLookupResult{
-		Type:        t,
+	result := Security{
+		Type:        string(t),
 		CompanyName: scrape.Text(companyName),
 		Symbol:      scrape.Text(symbol),
+		CUSIP:       cusip,
 	}
 
 	return &result, nil

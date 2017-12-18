@@ -274,6 +274,14 @@ func ToPositionList(table *InformationTable) []Position {
 	ps := []Position{}
 
 	for _, t := range table.InfoTable {
+		// Some reports include invalid CUSIPs that are less than the required 9
+		// characters. It appears that these entries are neglecting to include
+		// leading 0s. At the risk of innacuracy, we will attempt to correct the
+		// errors here
+		for len(t.CUSIP) < 9 {
+			t.CUSIP = "0" + t.CUSIP
+			fmt.Println("Corrected CUSIP for", t.Issuer, "to", t.CUSIP)
+		}
 		p := Position{
 			DocumentID:     table.ReportInfo.AccessionNumber,
 			CompanyID:      table.ReportInfo.CompanyCIK,

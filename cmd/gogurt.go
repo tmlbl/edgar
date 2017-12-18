@@ -29,6 +29,7 @@ func main() {
 	db = handle
 
 	db.AutoMigrate(&edgar.Position{})
+	db.AutoMigrate(&edgar.Security{})
 
 	for {
 		// Pull the latest 13F filings
@@ -72,9 +73,23 @@ func insertIfMissing(t edgar.InformationTable) {
 	if err == gorm.ErrRecordNotFound {
 		start := time.Now()
 		tx := db.Begin()
-		fmt.Println(t.InfoTable[0].Issuer)
+
 		positions := edgar.ToPositionList(&t)
-		for _, p := range positions {
+		for pix, p := range positions {
+			// Look up the security. First check if we already have it.
+			err := db.Where("cus_ip = ?", p.CUSIP).Find(&edgar.Security{}).Error
+			if err == gorm.ErrRecordNotFound {
+				// fmt.Println("Looking up position of type", p.PositionType)
+				sec, err := edgar.LookupCUSIP(edgar.FidelityStock, p.CUSIP)
+				if err != nil {
+					fmt.Printf("Error looking up CUSIP %s for company %s in document %s: %s\n",
+						p.CUSIP, t.InfoTable[pix].Issuer, p.DocumentID, err)
+				} else {
+					// fmt.Println("Got security", sec)
+					tx.Save(&sec)
+				}
+			}
+			// Save the position
 			tx.Save(&p)
 		}
 		tx.Commit()
