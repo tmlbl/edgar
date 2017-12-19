@@ -64,5 +64,30 @@ func TestParseLegacy13F(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(info)
+
+	// Check header parsing
+	expectStrEq(t, "0001193125-10-027043", info.ReportInfo.AccessionNumber)
+	expectStrEq(t, "0000932859", info.ReportInfo.CompanyCIK)
+
+	// Find the entry for Exxon Mobil
+	var exxon *InfoTable
+	for _, t := range info.InfoTable {
+		if t.CUSIP == "30231G102" {
+			exxon = &t
+			break
+		}
+	}
+	if exxon == nil {
+		t.Errorf("Did not find the expected entry")
+	}
+	if exxon.Value != 457916.59326 {
+		t.Errorf("Position value wrong: expected %f, got %f",
+			457916.59326, exxon.Value)
+	}
+}
+
+func expectStrEq(t *testing.T, expected, actual string) {
+	if expected != actual {
+		t.Errorf("Expected %s to equal %s\n", actual, expected)
+	}
 }

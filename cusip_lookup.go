@@ -30,12 +30,6 @@ const (
 	FidelityAnnuity    FidelitySecurityType = "annuity"
 )
 
-type FidelityLookupResult struct {
-	Type        FidelitySecurityType
-	CompanyName string
-	Symbol      string
-}
-
 type Security struct {
 	Type        string
 	CompanyName string

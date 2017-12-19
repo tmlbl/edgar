@@ -77,7 +77,7 @@ type InfoTable struct {
 	Issuer       string       `xml:"nameOfIssuer"`
 	ClassTitle   string       `xml:"titleOfClass"`
 	CUSIP        string       `xml:"cusip"`
-	Value        int          `xml:"value"`
+	Value        float64      `xml:"value"`
 	PositionInfo PositionInfo `xml:"shrsOrPrnAmt"`
 }
 
@@ -99,7 +99,7 @@ type Position struct {
 	DocumentID     string `gorm:"primary_key"`
 	CompanyID      string
 	CUSIP          string `gorm:"primary_key"`
-	Value          int
+	Value          float64
 	PositionAmount int
 	PositionType   string
 	DateObserved   time.Time
@@ -148,7 +148,7 @@ func extractLines(delim string, lines []string) [][]string {
 	for _, ln := range lines {
 		if strings.Index(ln, "<"+delim) != -1 {
 			cap = true
-			fmt.Println("cap start", ln)
+			// fmt.Println("cap start", ln)
 		}
 
 		if cap {
@@ -159,7 +159,7 @@ func extractLines(delim string, lines []string) [][]string {
 			cap = false
 			xxlines = append(xxlines, xlines)
 			xlines = []string{}
-			fmt.Println("cap end", ln)
+			// fmt.Println("cap end", ln)
 		}
 	}
 
@@ -190,8 +190,14 @@ func legacyGetFormat(lines []string) ([]int, error) {
 
 func parseLegacy13F(data string) (*InformationTable, error) {
 	lines := strings.Split(data, "\n")
+	table := InformationTable{}
 
 	tables := extractLines("TABLE", lines)
+	header, err := parse13fheader(data)
+	if err != nil {
+		fmt.Println("Error parsing legacy header:", err)
+	}
+	table.ReportInfo = header
 
 	for _, t := range tables {
 		format, err := legacyGetFormat(t)
@@ -202,7 +208,7 @@ func parseLegacy13F(data string) (*InformationTable, error) {
 			fields := []string{}
 
 			if len(ln) < format[len(format)-1] {
-				fmt.Println("This line is too short:", ln)
+				// fmt.Println("This line is too short:", ln)
 				continue
 			}
 
@@ -214,11 +220,40 @@ func parseLegacy13F(data string) (*InformationTable, error) {
 					fields = append(fields, strings.TrimSpace(ln[format[i]:]))
 				}
 			}
-			fmt.Println(len(fields))
+
+			// Skip any non-data rows
+			if fields[3] == "<C>" || fields[3] == "--" {
+				// fmt.Println("Skipping non-data row")
+				continue
+			}
+
+			value, err := strconv.ParseFloat(strings.Replace(fields[3], ",", "", -1), 64)
+			if err != nil {
+				fmt.Printf("Error converting value %s to integer\n", fields[3])
+				continue
+			}
+
+			amt, err := strconv.Atoi(strings.Replace(fields[4], ",", "", -1))
+			if err != nil {
+				fmt.Printf("Error converting amt %s to integer\n", fields[4])
+				continue
+			}
+
+			it := InfoTable{
+				Issuer:     fields[0],
+				ClassTitle: fields[1],
+				CUSIP:      fields[2],
+				Value:      value,
+				PositionInfo: PositionInfo{
+					Amount: amt,
+					Type:   fields[5],
+				},
+			}
+			table.InfoTable = append(table.InfoTable, it)
 		}
 	}
 
-	return nil, nil
+	return &table, nil
 }
 
 type ReportInfo struct {
