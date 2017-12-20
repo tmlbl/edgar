@@ -331,3 +331,8 @@ func ToPositionList(table *InformationTable) []Position {
 
 	return ps
 }
+
+// Search for all historical 13F forms in 'Information Table' HTML format
+// https://searchwww.sec.gov/EDGARFSClient/jsp/EDGAR_MainAccess.jsp?
+// search_text=INFORMATION%20TABLE&sort=Date&formType=Form13FHR&isAdv=true
+// &stemming=true&numResults=100&numResults=100

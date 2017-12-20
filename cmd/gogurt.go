@@ -38,6 +38,7 @@ func main() {
 			log.Println("Error getting latest 13Fs:", err)
 			continue
 		}
+		fmt.Printf("Retrieved %d 13F filings.\n", len(tables))
 
 		// Get list of unique CIKs from document list
 		cikmap := map[string]int{}
