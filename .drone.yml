@@ -4,6 +4,10 @@ name: default
 steps:
 - name: edgar
   image: golang:1.11
+  environment:
+    DIR: $GOPATH/src/github.com/tmlbl/edgar
   commands:
+  - cp -r . $DIR
+  - cd $DIR
   - go get ./...
   - go test -v
