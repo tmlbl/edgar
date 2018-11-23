@@ -1,0 +1,9 @@
+kind: pipeline
+name: default
+
+steps:
+- name: edgar
+  image: golang:1.11
+  commands:
+  - go get ./...
+  - go test -v
