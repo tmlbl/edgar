@@ -5,10 +5,9 @@ steps:
 - name: edgar
   image: golang:1.11
   commands:
-  - export DIR=$GOPATH/src/github.com/tmlbl
+  - export DIR=$GOPATH/src/github.com/tmlbl/edgar
   - mkdir -p $DIR
   - cp -r . $DIR
-  - ls $DIR
-  - cd $DIR/edgar
+  - cd $DIR
   - go get ./...
   - go test -v
