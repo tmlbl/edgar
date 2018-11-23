@@ -8,6 +8,7 @@ steps:
   - export DIR=$GOPATH/src/github.com/tmlbl
   - mkdir -p $DIR
   - cp -r . $DIR
+  - ls $DIR/edgar
   - cd $DIR/edgar
   - go get ./...
   - go test -v
